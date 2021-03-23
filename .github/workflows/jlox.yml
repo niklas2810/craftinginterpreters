@@ -20,7 +20,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-
       - name: 💽 Restore Maven cache
         uses: actions/cache@v2
         with:
@@ -30,3 +29,4 @@ jobs:
             build-${{ runner.os }}-
       - name: 🧪 Run tests & 📦 Build package
         run: mvn clean test package
+        working-directory: ./jlox
