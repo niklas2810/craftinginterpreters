@@ -3,3 +3,4 @@
 - Modulo operator (%)
 - defined ==  !nil
 - Ternaries
+- Escaping double quote in string with \\"

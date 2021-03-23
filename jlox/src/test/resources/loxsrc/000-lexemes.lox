@@ -1,0 +1,7 @@
+// this is a comment
+(( )){} // grouping stuff
+!*+-/=<> <= == // operators
+
+/* This a block comment.
+All content before the closing tag should be ignored.
+Let's hope that this works! */

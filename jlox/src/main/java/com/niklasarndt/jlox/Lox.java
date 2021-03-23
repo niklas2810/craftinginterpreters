@@ -14,49 +14,75 @@ import java.util.List;
 
 public class Lox {
 
-    public static void main(String[] args) {
-        try {
-            init(args);
-        } catch (IOException exception) {
-            System.err.println("Failed to execute: ");
-            exception.printStackTrace();
-            System.exit(ExitCodes.ERROR);
-        }
+    private final boolean silent;
+    private boolean hadError = false;
+
+    public Lox() {
+        this(false);
     }
 
-    private static void init(String[] args) throws IOException {
-        if(args.length > 1) {
-            System.out.println("Usage: jlox [script]");
+    public Lox(boolean silent) {
+        this.silent = silent;
+    }
+
+    void init(String[] args) throws IOException {
+        if (args.length > 1) {
+            if (!silent)
+                System.out.println("Usage: jlox [script]");
             System.exit(ExitCodes.USAGE);
-        } else if(args.length == 1) {
+        } else if (args.length == 1) {
             runFile(args[0]);
         } else {
             displayRepl();
         }
     }
 
-    private static void runFile(String path) throws IOException {
-        runLox(Files.readString(Paths.get(path), Charset.defaultCharset()));
+    private void runFile(String path) throws IOException {
+        run(Files.readString(Paths.get(path), Charset.defaultCharset()));
+
+        if (hadError)
+            System.exit(ExitCodes.PARSING_ERROR);
     }
 
-    private static void displayRepl() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))){
+    private void displayRepl() throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
             String line;
+            long last = 0;
 
-
-            while(true) {
-                System.out.print("> ");
+            while (true) {
+                if (!silent)
+                    System.out.print((last > 0 ? String.format("[%dms]\n",
+                            System.currentTimeMillis() - last) : "") + "> ");
                 line = reader.readLine();
-                if(line == null) break;
-                runLox(line);
+                if (line == null) break;
+                last = System.currentTimeMillis();
+                run(line);
+                hadError = false;
             }
         } catch (IOException e) {
             throw new IOException("Could not read from sysin", e);
         }
     }
 
-    private static void runLox(String src) {
-        Scanner scanner = new Scanner(src);
+    public void run(String source) {
+        Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
+    }
+
+    public void error(int line, String message) {
+        report(line, "", message);
+    }
+
+    private void report(int line, String location, String message) {
+        if (!silent)
+            System.err.println((line > 0 ? "[line " + line + "] " : "") + "Error"
+                    + (location != null && location.length() > 0 ? " in " + location : "")
+                    + ": " + message);
+
+        hadError = true;
+    }
+
+    public boolean hadError() {
+        return hadError;
     }
 }

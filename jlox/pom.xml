@@ -18,7 +18,7 @@
         <source.version>11</source.version>
         <target.version>11</target.version>
 
-        <mainClass>com.niklasarndt.jlox.Lox</mainClass>
+        <mainClass>com.niklasarndt.jlox.Main</mainClass>
     </properties>
 
     <dependencies>
