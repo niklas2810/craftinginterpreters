@@ -1,4 +1,6 @@
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -53,7 +55,25 @@ public class Tests {
               p.waitFor();
               if(p.exitValue() != 0) {
                 System.err.println("ERROR: " + name + " returned " + p.exitValue() + " for " + shortName);
-                return;
+                System.err.println("Application Output:");
+                try(BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                  String line;
+
+                  while((line = reader.readLine()) != null)
+                    System.out.println(line);
+                } catch (IOException e) {
+                  System.err.println("Could not read application standard output");
+                }
+
+                try(BufferedReader reader = new BufferedReader(new InputStreamReader(p.getErrorStream()))) {
+                  String line;
+
+                  while((line = reader.readLine()) != null)
+                    System.out.println(line);
+                } catch (IOException e) {
+                  System.err.println("Could not read application error output");
+                }
+                System.exit(1);
               }
             } catch(Exception e) {
               System.out.print("[FAILED due to " + e.getClass().getSimpleName() + "] ");
