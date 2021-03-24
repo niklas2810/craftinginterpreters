@@ -27,25 +27,27 @@ public class Tests {
   }
 
   private void registerJloxTester() {
-    File location = new File("jlox.jar");
+    String path = "jlox.jar";
+    File location = new File(path);
 
     if(!location.exists()) {
-      location = new File(String.format("jlox%starget%sjlox.jar", File.separator, File.separator));
-    }
+      path = String.format("jlox%starget%sjlox.jar", File.separator, File.separator);
+      location = new File(path);
 
-    if(!location.exists()) {
-      System.err.println("File jlox.jar is not present in current directory or in jlox/target/");
-      System.exit(1);
+      if(!location.exists()) {
+        System.err.println("File jlox.jar is not present in current directory or in jlox/target/");
+        System.exit(1);
+      }
     }
 
     System.out.println("Using jar at location " + location.getAbsolutePath());
-    testers.put("Java", "java -jar \"" + location.getAbsolutePath() + "\"");
+    testers.put("Java", "java -jar " +  path);
   }
 
   private void runPerformanceTests() {
       System.out.println("=".repeat(50));
       for(File f : testDir.listFiles((dir, name) -> name.endsWith(".lox"))) {
-          String shortName=f.getName().substring(0, f.getName().indexOf(".lox"));
+          String shortName= f.getName().substring(0, f.getName().indexOf(".lox"));
           String prompt = "-".repeat((43-shortName.length())/2) + " FILE: " + shortName + " ";
           System.out.println(prompt + "-".repeat(50-prompt.length()));
 
