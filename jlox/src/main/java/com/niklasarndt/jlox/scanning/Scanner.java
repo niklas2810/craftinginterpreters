@@ -127,6 +127,7 @@ public class Scanner {
     }
 
     private void parseIdentifier() {
+        while (isAlphaNumeric(peek())) next();
         String text = source.substring(start, current);
 
         for (TokenType tokenType : TokenType.values()) {
