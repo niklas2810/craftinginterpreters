@@ -1,8 +1,12 @@
 package com.niklasarndt.jlox;
 
+import com.niklasarndt.jlox.parsing.Parser;
 import com.niklasarndt.jlox.scanning.Scanner;
 import com.niklasarndt.jlox.scanning.Token;
+import com.niklasarndt.jlox.syntax.AstPrinter;
+import com.niklasarndt.jlox.syntax.Expression;
 import com.niklasarndt.jlox.util.ExitCodes;
+import com.niklasarndt.jlox.util.TokenType;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,6 +14,7 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 public class Lox {
@@ -67,16 +72,31 @@ public class Lox {
     public void run(String source) {
         Scanner scanner = new Scanner(this, source);
         List<Token> tokens = scanner.scanTokens();
+
+        final Parser parser = new Parser(this, tokens);
+        Expression expression = parser.parse();
+
+        if(hadError)
+            System.out.println(Arrays.toString(tokens.toArray()));
+        else
+            System.out.println(new AstPrinter().print(expression));
     }
 
     public void error(int line, String message) {
         report(line, "", message);
     }
 
+    public void error(Token token, String message) {
+        if(token.type == TokenType.EOF)
+            report(token.line, "end of file", message);
+        else
+            report(token.line, token.lexeme, message);
+    }
+
     private void report(int line, String location, String message) {
         if (!silent)
             System.err.println((line > 0 ? "[line " + line + "] " : "") + "Error"
-                    + (location != null && location.length() > 0 ? " in " + location : "")
+                    + (location != null && location.length() > 0 ? " at " + location : "")
                     + ": " + message);
 
         hadError = true;
