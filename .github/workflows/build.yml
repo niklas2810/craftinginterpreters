@@ -23,6 +23,7 @@ jobs:
         uses: actions/setup-java@v2.1.0
         with:
           java-version: 11
+          distribution: 'adopt'
       - name: 💽 Restore Maven cache
         uses: actions/cache@v2.1.6
         with:
